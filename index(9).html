@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#100d1c">
+<title>The World of Us — Ali × Areshey</title>
+<style>
+:root{--bg:#100d1c;--panel:#1c172b;--panel2:#251d38;--pink:#f18ab8;--gold:#e8c78c;--text:#fff5fb;--muted:#bdb1c9;--line:#40334f;--green:#8bd6b0}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#473052 0,transparent 48%),var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+button,input{font:inherit}button{border:0;border-radius:14px;padding:13px 16px;background:linear-gradient(135deg,#e986b6,#bd6d9c);color:#210f20;font-weight:750;cursor:pointer;min-height:46px}button.secondary{background:#302640;color:var(--text);border:1px solid var(--line)}button:disabled{opacity:.45;cursor:not-allowed}
+.wrap{max-width:980px;margin:auto;padding:18px 14px 40px}.hero{text-align:center;padding:22px 8px 18px}.eyebrow{color:var(--gold);letter-spacing:.2em;font-size:11px;font-weight:800}.hero h1{font-family:Georgia,serif;font-size:clamp(34px,8vw,58px);line-height:1.02;margin:10px 0;color:#ffe6f1}.hero p{color:var(--muted);margin:8px auto;max-width:540px}.spark{font-size:25px;color:var(--pink)}
+.card{background:linear-gradient(160deg,rgba(40,31,58,.96),rgba(25,20,39,.98));border:1px solid var(--line);border-radius:22px;padding:18px;margin:12px 0;box-shadow:0 14px 40px #0003}.card h2,.card h3{margin:0 0 12px;font-family:Georgia,serif}.muted{color:var(--muted)}.small{font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{width:100%;border:1px solid var(--line);background:#130f20;color:var(--text);border-radius:12px;padding:13px;outline:none;min-width:0}.field:focus{border-color:var(--pink)}.stack{display:grid;gap:10px}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.hidden{display:none!important}.status{display:inline-flex;align-items:center;gap:7px;color:var(--green);font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block}.roomcode{font-size:25px;letter-spacing:.2em;font-weight:850;color:var(--gold);font-variant-numeric:tabular-nums}.tabs{display:flex;gap:8px;margin:12px 0}.tab{flex:1;background:#211a30;color:var(--muted);border:1px solid var(--line)}.tab.active{background:#493047;color:#ffe4f0;border-color:#a75e87}.chatlog{height:270px;overflow:auto;background:#120e1d;border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:9px}.bubble{max-width:86%;padding:9px 12px;border-radius:15px;background:#302640;align-self:flex-start;overflow-wrap:anywhere}.bubble.mine{background:#633b5a;align-self:flex-end}.bubble b{display:block;font-size:11px;color:var(--gold);margin-bottom:3px}.bubble time{display:block;color:#d4c4d1;font-size:10px;text-align:right;margin-top:4px}.gamechoices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.choice{font-size:25px;padding:15px 5px;background:#302640;color:white;border:1px solid var(--line)}.choice.selected{outline:2px solid var(--gold);background:#573d58}.notice{padding:12px;border-radius:12px;background:#302640;color:#f7dce9;margin-top:10px}.footer{text-align:center;color:#887b94;font-size:11px;padding:20px}.pill{border:1px solid var(--line);padding:6px 10px;border-radius:99px;color:var(--muted);font-size:11px}
+@media(max-width:560px){.wrap{padding:12px 11px 30px}.card{padding:15px;border-radius:18px}.grid{grid-template-columns:1fr}.chatlog{height:250px}.hero{padding-top:16px}.row.stack-mobile{display:grid;grid-template-columns:1fr 1fr}.roomcode{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+  <div class="eyebrow">A PRIVATE TWO-PLAYER UNIVERSE</div>
+  <div class="spark">✦ ✧ ♥ ✧ ✦</div>
+  <h1>The World<br>of Us</h1>
+  <p>One little universe for two people. Create a room, invite your favourite person, and explore it together.</p>
+  <div class="pill">ALI × ARESHEY</div>
+</header>
+
+<section id="setup" class="card">
+  <h2>Enter your universe</h2>
+  <p class="muted small">Choose your player name. A room code keeps your game private from other players.</p>
+  <div class="stack">
+    <input id="playerName" class="field" maxlength="18" placeholder="Your name (Ali or Areshey)" autocomplete="nickname">
+    <div class="grid">
+      <button id="createBtn">✦ Create room</button>
+      <div class="stack" style="gap:7px">
+        <input id="joinCode" class="field" maxlength="6" placeholder="6-character code" autocapitalize="characters">
+        <button id="joinBtn" class="secondary">Join room</button>
+      </div>
+    </div>
+  </div>
+  <div id="setupMsg" class="notice hidden"></div>
+</section>
+
+<section id="lobby" class="card hidden">
+  <div class="row">
+    <div><div class="small muted">YOUR PRIVATE ROOM</div><div id="roomCode" class="roomcode">------</div></div>
+    <button id="copyCode" class="secondary">Copy code</button>
+  </div>
+  <p id="playerStatus" class="muted">Waiting for the second player…</p>
+  <div id="players" class="grid"></div>
+  <div class="notice small">Send this code to the other player. When both players are here, start exploring together.</div>
+  <button id="startBtn" class="hidden" style="width:100%;margin-top:12px">Enter our world ♥</button>
+</section>
+
+<section id="world" class="hidden">
+  <div class="card">
+    <div class="row"><div><div class="eyebrow">CHAPTER 01</div><h2 style="margin:4px 0">The Beginning</h2></div><span id="onlineStatus" class="status"><i class="dot"></i> Connected</span></div>
+    <p class="muted">You found each other in this little universe. Now choose a challenge and make a memory.</p>
+    <div class="tabs">
+      <button class="tab active" data-tab="adventure">Adventure</button>
+      <button class="tab" data-tab="chat">Our chat</button>
+    </div>
+    <div id="adventurePanel">
+      <div class="card" style="margin:0;background:#171222">
+        <h3>✧ Rock, Paper, Scissors ✧</h3>
+        <p class="muted small">Choose your move. Your choice stays hidden until both players have picked.</p>
+        <div class="gamechoices">
+          <button class="choice" data-move="rock" aria-label="Rock">✊</button>
+          <button class="choice" data-move="paper" aria-label="Paper">✋</button>
+          <button class="choice" data-move="scissors" aria-label="Scissors">✌️</button>
+        </div>
+        <div id="gameResult" class="notice">Waiting for both players to choose…</div>
+        <div class="row" style="margin-top:10px"><button id="nextRound" class="secondary" disabled>Next round</button><span id="roundNo" class="muted small">Round 1</span></div>
+      </div>
+      <div class="card" style="margin:12px 0 0;background:#171222">
+        <h3>💌 A little question</h3>
+        <p id="questionText" class="muted">What is one tiny moment with the other person that makes you smile?</p>
+        <button id="newQuestion" class="secondary">Give us another question</button>
+      </div>
+    </div>
+    <div id="chatPanel" class="hidden">
+      <div id="chatLog" class="chatlog" aria-live="polite"></div>
+      <form id="chatForm" class="row" style="margin-top:10px">
+        <input id="chatInput" class="field" maxlength="500" placeholder="Write something sweet…" autocomplete="off">
+        <button type="submit" style="flex:0 0 auto">Send</button>
+      </form>
+      <p class="muted small">Messages are visible to the two members of this room.</p>
+    </div>
+  </div>
+  <div class="row"><button id="leaveBtn" class="secondary">Leave room</button><span class="muted small" style="text-align:right">Keep your room code private.</span></div>
+</section>
+
+<section id="configHelp" class="card">
+  <h3>First-time setup</h3>
+  <p class="muted small">This page needs your own free Firebase project before online rooms and chat can work. Follow the setup guide included with this file. Until Firebase is configured, the game will show a setup message.</p>
+</section>
+<div class="footer">Made with ♥ for two. Keep your room code between you both.</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase, ref, set, get, update, push, onValue, runTransaction, serverTimestamp, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+/* PASTE YOUR FIREBASE WEB CONFIG HERE. Replace every placeholder with your project's values. */
+const firebaseConfig = {
+  apiKey: "PASTE_API_KEY",
+  authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://PASTE_DATABASE_NAME-default-rtdb.firebaseio.com",
+  projectId: "PASTE_PROJECT_ID",
+  appId: "PASTE_APP_ID"
+};
+
+const $ = id => document.getElementById(id);
+const show = (id, yes=true) => $(id).classList.toggle("hidden", !yes);
+let app, auth, db, uid=null, roomId=null, myName="", roomData=null, unsubRoom=null, unsubChat=null, unsubGame=null, currentRound=1, myMove=null;
+const moves={rock:"✊ Rock",paper:"✋ Paper",scissors:"✌️ Scissors"};
+const questions=[
+"What is one tiny moment with the other person that makes you smile?",
+"If we could teleport anywhere together for one evening, where would we go?",
+"What song would you choose as the soundtrack of our adventure?",
+"What is something small the other person does that you secretly adore?",
+"Describe our duo in three words.",
+"What would our perfect no-plans day look like?"
+];
+function message(text){$("setupMsg").textContent=text;show("setupMsg",true)}
+function cleanName(){return $("playerName").value.trim().slice(0,18)}
+function makeCode(){return Array.from(crypto.getRandomValues(new Uint8Array(6)),n=>"ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[n%32]).join("")}
+function configured(){return !firebaseConfig.apiKey.startsWith("PASTE_")&&!firebaseConfig.projectId.startsWith("PASTE_")&&!firebaseConfig.appId.startsWith("PASTE_")}
+async function boot(){
+ if(!configured()){message("Firebase setup is not finished yet. Open the setup guide and paste your Firebase web config into this file.");$("createBtn").disabled=true;$("joinBtn").disabled=true;return}
+ try{
+  app=initializeApp(firebaseConfig);auth=getAuth(app);db=getDatabase(app);
+  await signInAnonymously(auth);
+  onAuthStateChanged(auth,user=>{if(user){uid=user.uid;$("createBtn").disabled=false;$("joinBtn").disabled=false}});
+ }catch(e){message("Firebase connection error: "+e.message+" Check your Firebase config, Authentication and Realtime Database settings.");}
+}
+$("createBtn").disabled=true;$("joinBtn").disabled=true;
+$("createBtn").onclick=async()=>{
+ myName=cleanName();if(!myName)return message("Please enter your name first.");
+ if(!uid)return message("Firebase is still connecting. Please wait a moment.");
+ $("createBtn").disabled=true;
+ try{
+  let code,exists=true;for(let i=0;i<8&&exists;i++){code=makeCode();exists=(await get(ref(db,"rooms/"+code))).exists()}
+  if(exists)throw new Error("Could not create a unique room. Try again.");
+  roomId=code;
+  await set(ref(db,"rooms/"+roomId),{createdAt:serverTimestamp(),createdBy:uid,players:{[uid]:{name:myName,joinedAt:serverTimestamp(),online:true}},round:1,game:{},status:"lobby"});
+  await enterRoom();
+ }catch(e){message("Could not create room: "+e.message)}finally{$("createBtn").disabled=false}
+};
+$("joinBtn").onclick=async()=>{
+ myName=cleanName();const code=$("joinCode").value.trim().toUpperCase();
+ if(!myName)return message("Please enter your name first.");
+ if(!/^[A-HJ-NP-Z2-9]{6}$/.test(code))return message("Enter the six-character room code.");
+ try{
+  const roomRef=ref(db,"rooms/"+code),snap=await get(roomRef);
+  if(!snap.exists())return message("Room not found. Check the code with the room creator.");
+  const data=snap.val(),players=data.players||{};
+  if(!players[uid]&&Object.keys(players).length>=2)return message("This room already has two players.");
+  if(!players[uid])await update(roomRef,{["players/"+uid]:{name:myName,joinedAt:serverTimestamp(),online:true}});
+  roomId=code;await enterRoom();
+ }catch(e){message("Could not join room: "+e.message)}
+};
+async function enterRoom(){
+ show("setup",false);show("configHelp",false);show("lobby",true);show("world",false);
+ $("roomCode").textContent=roomId;
+ const roomRef=ref(db,"rooms/"+roomId);
+ await onDisconnect(ref(db,`rooms/${roomId}/players/${uid}/online`)).set(false);
+ unsubRoom=onValue(roomRef,snap=>{
+  if(!snap.exists()){leaveLocal("This room is no longer available.");return}
+  roomData=snap.val();const players=roomData.players||{},ids=Object.keys(players);
+  $("players").innerHTML="";
+  ids.forEach(id=>{const d=document.createElement("div");d.className="notice";d.textContent=(players[id].name||"Player")+(id===uid?" (you)":"")+(players[id].online?" · online":" · offline");$("players").append(d)});
+  $("playerStatus").textContent=ids.length===2?"Both players are here. Ready when you are!":"Waiting for the second player…";
+  show("startBtn",ids.length===2);
+  if(roomData.status==="playing"){show("lobby",false);show("world",true);drawGame()}
+  currentRound=roomData.round||1;$("roundNo").textContent="Round "+currentRound;
+ });
+ $("copyCode").onclick=async()=>{try{await navigator.clipboard.writeText(roomId);$("copyCode").textContent="Copied ✓"}catch{$("copyCode").textContent=roomId}};
+ $("startBtn").onclick=()=>update(roomRef,{status:"playing"});
+ listenChat();listenGame();
+}
+function listenChat(){
+ unsubChat=onValue(ref(db,`rooms/${roomId}/messages`),snap=>{
+  const box=$("chatLog");box.innerHTML="";
+  const msgs=[];snap.forEach(child=>msgs.push(child.val()));msgs.sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  msgs.slice(-100).forEach(m=>{
+   const el=document.createElement("div");el.className="bubble"+(m.uid===uid?" mine":"");
+   const name=document.createElement("b");name.textContent=m.name||"Player";
+   const body=document.createElement("span");body.textContent=m.text||"";
+   const time=document.createElement("time");time.textContent=m.createdAt?new Date(m.createdAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"";
+   el.append(name,body,time);box.append(el);
+  });box.scrollTop=box.scrollHeight;
+ });
+}
+$("chatForm").onsubmit=async e=>{
+ e.preventDefault();const text=$("chatInput").value.trim();if(!text||!roomId)return;
+ $("chatInput").value="";
+ try{await push(ref(db,`rooms/${roomId}/messages`),{uid,name:myName,text,createdAt:Date.now()})}catch(err){message("Message not sent: "+err.message)}
+};
+function listenGame(){unsubGame=onValue(ref(db,`rooms/${roomId}/game`),snap=>{const g=snap.val()||{};const round=g[currentRound]||{};myMove=round[uid]?.move||null;document.querySelectorAll(".choice").forEach(b=>b.classList.toggle("selected",b.dataset.move===myMove));renderResult(round)})}
+function winner(a,b){if(a===b)return "It's a tie!";if((a==="rock"&&b==="scissors")||(a==="paper"&&b==="rock")||(a==="scissors"&&b==="paper"))return "Player 1 wins this round!";return "Player 2 wins this round!"}
+function renderResult(round){
+ const ids=Object.keys(roomData?.players||{});const a=ids[0],b=ids[1];
+ if(!a||!b){$("gameResult").textContent="Waiting for the second player…";return}
+ if(round[a]?.move&&round[b]?.move){
+  const one=round[a].move,two=round[b].move;
+  $("gameResult").textContent=`${roomData.players[a].name}: ${moves[one]} · ${roomData.players[b].name}: ${moves[two]} — ${one===two?"It's a tie!":winner(one,two)==="Player 1 wins this round!"?roomData.players[a].name+" wins!":roomData.players[b].name+" wins!"}`;
+  $("nextRound").disabled=false;
+ }else{$("gameResult").textContent=myMove?"Your move is locked in. Waiting for the other player…":"Waiting for both players to choose…";$("nextRound").disabled=true}
+}
+document.querySelectorAll(".choice").forEach(btn=>btn.onclick=async()=>{
+ if(!roomId||!roomData)return;
+ try{await set(ref(db,`rooms/${roomId}/game/${currentRound}/${uid}`),{move:btn.dataset.move,at:Date.now()})}catch(e){$("gameResult").textContent="Move not saved: "+e.message}
+});
+$("nextRound").onclick=async()=>{
+ const next=currentRound+1;await update(ref(db,"rooms/"+roomId),{round:next});currentRound=next;myMove=null;$("roundNo").textContent="Round "+next;$("gameResult").textContent="Choose your move!";
+};
+function drawGame(){currentRound=roomData?.round||1;$("roundNo").textContent="Round "+currentRound;renderResult((roomData?.game||{})[currentRound]||{})}
+document.querySelectorAll(".tab").forEach(tab=>tab.onclick=()=>{
+ document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t===tab));
+ show("adventurePanel",tab.dataset.tab==="adventure");show("chatPanel",tab.dataset.tab==="chat");
+});
+$("newQuestion").onclick=()=>{$("questionText").textContent=questions[Math.floor(Math.random()*questions.length)]};
+$("leaveBtn").onclick=async()=>{
+ try{if(roomId&&uid)await update(ref(db,`rooms/${roomId}/players/${uid}`),{online:false})}catch{}
+ leaveLocal("You left the room. You can create or join another room.");
+};
+function leaveLocal(msg){
+ [unsubRoom,unsubChat,unsubGame].forEach(fn=>{if(fn)fn()});unsubRoom=unsubChat=unsubGame=null;
+ roomId=null;roomData=null;show("world",false);show("lobby",false);show("setup",true);show("configHelp",true);message(msg);
+}
+boot();
+</script>
+</body>
+</html>
